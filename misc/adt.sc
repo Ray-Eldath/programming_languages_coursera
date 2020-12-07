@@ -1,12 +1,24 @@
-sealed trait AdtList
+trait AdtList {
+  type Rep
 
-private case class Empty() extends AdtList
-private case class Inc[T](val data: T, val succ: AdtList) extends AdtList
+  val empty: Rep
+  def isEmpty(rep: Rep): Boolean
+  def insert[T](xs: Rep, x: T): Rep
+  def contains[T](xs: Rep, x: T): Boolean
+}
 
-def empty(): AdtList = Empty()
-def insert[T](xs: AdtList, x: T): AdtList = Inc(x, xs)
-def isEmpty(xs: AdtList) = xs == Empty
-def contains[T](xs: AdtList, x: T): Boolean = xs match {
-  case Empty() => false
-  case Inc(c, xs) => if(c == x) true else contains(xs, x)
+object AdtListImpl extends AdtList {
+  sealed trait AdtListRep
+  private case class Empty() extends AdtListRep
+  private case class Inc[T](val data: T, val succ: AdtListRep) extends AdtListRep
+
+  override type Rep = AdtListRep
+
+  override val empty: AdtListRep = Empty()
+  override def isEmpty(xs: AdtListRep) = xs == Empty()
+  override def insert[T](xs: AdtListRep, x: T): AdtListRep = Inc(x, xs)
+  override def contains[T](xs: AdtListRep, x: T) = xs match {
+    case Empty() => false
+    case Inc(c, xs) => if(c == x) true else contains(xs, x)
+  }
 }
