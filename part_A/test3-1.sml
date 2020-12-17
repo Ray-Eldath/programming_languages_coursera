@@ -15,21 +15,26 @@ end
 
 fun empty_set () = make_set []
 
+exception InvalidArgument
 
-datatype counter = counter of { value: int,
-                                add: int -> counter,
-                                up: unit -> counter,
-                                minus: int -> counter,
-                                down: unit -> counter }
+datatype poscounter = 
+    poscounter of { value: int,
+                    add:   int -> poscounter,
+                    up:    unit -> poscounter,
+                    minus: int -> poscounter,
+                    down:  unit -> poscounter }
 
-fun make_counter v = 
+fun make_poscounter v = 
 let
-  fun add i = make_counter (v + i)
-  fun minus i = make_counter (v - i)
+  fun up () = add 1
+    and add i = make_poscounter (v + i)
+  fun down () = minus 1
+    and minus i = make_poscounter (v - i)
 in
-  counter { value = v,
-            add = add,
-            up = fn () => add 1,
-            minus = minus,
-            down = fn () => minus 1 }
+  if v < 0 then raise InvalidArgument
+  else poscounter { value = v,
+                    add   = add,
+                    up    = up,
+                    minus = minus,
+                    down  = down }
 end

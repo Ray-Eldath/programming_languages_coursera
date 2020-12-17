@@ -47,3 +47,22 @@
           (cons (car xs)
                 (my-filter (cdr xs) f))
           (my-filter (cdr xs) f))))
+
+(define (sum-all xs)
+  (if (null? xs)
+      0
+      (if (list? xs)
+          (if (number? (car xs))
+              (+ (car xs) (sum-all (cdr xs)))
+              (if (list? (car xs))
+                  (+ (sum-all (car xs)) (sum-all (cdr xs)))
+                  (sum-all (cdr xs))))
+          0)))
+
+(define (sum-all-cond xs)
+  (cond [(null? xs) 0]
+        [(list? xs)
+         (cond [(number? (car xs)) (+ (car xs) (sum-all (cdr xs)))]
+               [(list? (car xs)) (+ (sum-all-cond (car xs)) (sum-all-cond (cdr xs)))]
+               [#t 0])]
+        [#t 0]))
