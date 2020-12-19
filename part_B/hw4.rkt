@@ -1,4 +1,3 @@
-
 #lang racket
 
 (provide (all-defined-out)) ;; so we can put tests in a second file
@@ -26,7 +25,7 @@
   (if (= n 0)
       null
       (let ([evaluated (s)])
-               (cons (car evaluated) (take (cdr evaluated) (- n 1))))))
+        (cons (car evaluated) (stream-for-n-steps (cdr evaluated) (- n 1))))))
 
 ;; 5
 (define (funny-number-stream)
@@ -48,16 +47,15 @@
 
 ;; 7
 (define (stream-add-zero s)
-  (lambda () (begin (define evaluated (s))
-         (cons (cons 0 (car evaluated))
-               (lambda () (stream-add-zero (cdr evaluated)))))))
+  (lambda () (let ([evaluated (s)])
+               (cons (cons 0 (car evaluated)) (stream-add-zero (cdr evaluated))))))
 
 ;; 8
 (define (cycle-lists xs ys)
   (lambda () (begin (define (helper n)
-           (cons (cons (list-nth-mod xs n) (list-nth-mod ys n))
-                 (lambda () (helper (+ n 1)))))
-         (helper 0))))
+                      (cons (cons (list-nth-mod xs n) (list-nth-mod ys n))
+                            (lambda () (helper (+ n 1)))))
+                    (helper 0))))
 
 ;; 9
 (define (vector-assoc v vec)
@@ -103,6 +101,7 @@
        (helper))]))
 
 
-; helper function: not part of the course
+; helper definitions: not part of the course
+(define ones (lambda () (cons 1 ones)))
 (define (take stream n)
   (stream-for-n-steps stream n))
